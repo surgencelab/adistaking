@@ -59,6 +59,21 @@ Derived from real state, not a toggle — `components/staking/StakingPage.tsx`:
 | **stake** | connected, no positions | Pool basics, minimum stake (100 ADI), per-term APY. Pool activity still gated. |
 | **manage** | connected with positions | Positions table with actions, volume chart, full pool composition and recent activity. |
 
+## Earnings estimate
+
+`components/staking/EarningsEstimate.tsx` sits in the stake form between the summary rows
+and the CTA — per month and per year at the selected term's APY, read before committing to
+an amount.
+
+Before an amount is typed it previews against the connected wallet's balance, falling back
+to `EXAMPLE_STAKE` (1,000 ADI) when disconnected, and says which it used. All four figures
+— per month, per year, at maturity, and predicted APY — come from one function,
+`estimateEarnings` in `lib/earnings.ts`, so the stake form's "Est. rewards" row can never
+drift from the panel.
+
+The per-year figure is annualised, not attainable, on any term shorter than a year; the
+caption says so, and pairs it with the standing "APY is variable" caveat from the FAQ.
+
 ## Layout
 
 ```

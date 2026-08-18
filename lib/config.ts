@@ -38,6 +38,10 @@ export const LOCK_TERMS: LockTerm[] = [
 
 export const DEFAULT_TERM_DAYS = 180;
 
+/** Stand-in principal for the earnings estimate before an amount is entered and
+ *  when no wallet balance is available to preview against. */
+export const EXAMPLE_STAKE = 1_000;
+
 /** Rough network fee hint shown under the stake form. */
 export const EST_NETWORK_FEE = '~0.0004 ADI';
 

@@ -8,9 +8,18 @@ import { useAllowance, useTokenBalance } from '@/lib/hooks/useTokenBalance';
 import { usePool } from '@/lib/hooks/usePoolData';
 import { useStakeActions } from '@/lib/hooks/useStakeActions';
 import { useNow } from '@/lib/hooks/useNow';
-import { DEFAULT_TERM_DAYS, EST_NETWORK_FEE, LOCK_TERMS, MIN_STAKE, TOKEN_SYMBOL } from '@/lib/config';
+import {
+  DEFAULT_TERM_DAYS,
+  EST_NETWORK_FEE,
+  EXAMPLE_STAKE,
+  LOCK_TERMS,
+  MIN_STAKE,
+  TOKEN_SYMBOL,
+} from '@/lib/config';
+import { estimateEarnings } from '@/lib/earnings';
 import { formatAdi, formatAdiAuto, formatDateShort, formatNumber, parseAmount } from '@/lib/format';
 import type { LockTermDays } from '@/lib/types';
+import { EarningsEstimate } from './EarningsEstimate';
 
 const DAY_MS = 86_400_000;
 
@@ -39,18 +48,27 @@ export function StakeForm({
   const baseApy = pool?.baseApyPct ?? 0;
 
   const insufficient = isConnected && balance !== undefined && amount > balance;
-  const needsApproval = amount > (allowance ?? 0);
+  // A zero allowance always needs approval first, including before an amount is
+  // typed — otherwise the form claims to be on step 2 of 2 from the start.
+  const approved = allowance ?? 0;
+  const needsApproval = approved <= 0 || amount > approved;
   const busy = pending === 'approve' || pending === 'stake';
 
-  const { apy, estRewards, endDate } = useMemo(() => {
-    const apyPct = baseApy * term.multiplier;
-    return {
-      apy: apyPct,
-      estRewards: amount > 0 ? (amount * apyPct * termDays) / (100 * 365) : null,
-      // now is 0 until the shared clock's first tick — show a dash rather than 1970.
-      endDate: now ? new Date(now + termDays * DAY_MS) : null,
-    };
-  }, [amount, baseApy, now, term.multiplier, termDays]);
+  // Before an amount is typed, the earnings panel previews against the wallet
+  // balance, falling back to a stand-in principal when disconnected.
+  const hasAmount = amount > 0;
+  const hasBalance = balance !== undefined && balance > 0;
+  const principal = hasAmount ? amount : hasBalance ? balance : EXAMPLE_STAKE;
+  const exampleSource: 'balance' | 'default' = hasBalance ? 'balance' : 'default';
+
+  const estimate = useMemo(
+    () => estimateEarnings(principal, baseApy, term.multiplier, termDays),
+    [baseApy, principal, term.multiplier, termDays],
+  );
+
+  // now is 0 until the shared clock's first tick — show a dash rather than 1970.
+  const endDate = useMemo(() => (now ? new Date(now + termDays * DAY_MS) : null), [now, termDays]);
+  const estRewards = hasAmount ? estimate.atMaturity : null;
 
   const submit = async () => {
     if (!isConnected) {
@@ -182,7 +200,7 @@ export function StakeForm({
         </div>
         <div style={{ ...row, borderTop: '1px solid var(--border-subtle)' }}>
           <span style={{ color: 'var(--text-muted)' }}>Predicted APY</span>
-          <b style={{ color: 'var(--text-heading)' }}>~{apy.toFixed(2)}%</b>
+          <b style={{ color: 'var(--text-heading)' }}>~{estimate.apyPct.toFixed(2)}%</b>
         </div>
         <div style={{ ...row, borderTop: '1px solid var(--border-subtle)' }}>
           <span style={{ color: 'var(--text-muted)' }}>Est. rewards</span>
@@ -191,6 +209,14 @@ export function StakeForm({
           </b>
         </div>
       </div>
+
+      <EarningsEstimate
+        estimate={estimate}
+        principal={principal}
+        termDays={termDays}
+        isExample={!hasAmount}
+        exampleSource={exampleSource}
+      />
 
       <Button size="lg" loading={busy} onClick={submit} disabled={isConnected && (blocked || insufficient)}>
         {label}
