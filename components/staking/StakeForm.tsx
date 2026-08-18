@@ -18,6 +18,7 @@ import {
 } from '@/lib/config';
 import { estimateEarnings } from '@/lib/earnings';
 import { adiFigure } from '@/lib/figures';
+import { RiskDisclosure } from './RiskDisclosure';
 import { formatAdi, formatAdiAuto, formatDateShort, parseAmount } from '@/lib/format';
 import type { LockTermDays } from '@/lib/types';
 import { EarningsEstimate } from './EarningsEstimate';
@@ -256,6 +257,8 @@ export function StakeForm({
             : 'Step 2 of 2: confirm the staking transaction.'}
         </div>
       )}
+
+      <RiskDisclosure variant="inline" />
     </div>
   );
 }

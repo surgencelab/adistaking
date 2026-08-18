@@ -48,8 +48,8 @@ export function Hero({
 
         <p style={{ font: 'var(--type-body)', color: 'var(--text-muted)', margin: '22px 0 0', maxWidth: 460 }}>
           The $ADI staking program allocates a fixed ecosystem participation incentive to time-locked positions on ADI
-          Chain. Each position&rsquo;s share is weighted by lock duration, with principal and accrued rewards released
-          at maturity.
+          Chain. Each position&rsquo;s share is weighted by lock duration, with principal and accrued rewards becoming
+          claimable at maturity.
         </p>
 
         {positions.length > 0 && (

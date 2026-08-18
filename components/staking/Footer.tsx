@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import { LINKS, STAKING_ADDRESS, TOKEN_ADDRESS } from '@/lib/config';
 import { explorerAddressUrl } from '@/lib/chains';
+import { RiskDisclosure } from './RiskDisclosure';
 
 const ZERO = '0x0000000000000000000000000000000000000000';
 
@@ -24,7 +25,9 @@ export function Footer() {
   ];
 
   return (
-    <footer style={{ display: 'flex', justifyContent: 'center', gap: 28, padding: '34px 20px 46px', flexWrap: 'wrap' }}>
+    <footer style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 26, padding: '34px 20px 46px' }}>
+      <RiskDisclosure variant="full" />
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap' }}>
       {links.map((l) => (
         <a
           key={l.label}
@@ -44,6 +47,7 @@ export function Footer() {
           {l.external && <ArrowUpRight size={12} strokeWidth={2} />}
         </a>
       ))}
+      </div>
     </footer>
   );
 }

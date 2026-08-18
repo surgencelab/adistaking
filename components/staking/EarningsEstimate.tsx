@@ -95,7 +95,7 @@ export function EarningsEstimate({
             ? `Example based on your balance of ${formatAdiAuto(principal)}.`
             : `Example based on ${formatAdiAuto(principal)}.`
           : `Based on ${formatAdiAuto(principal)} at ~${estimate.apyPct.toFixed(2)}% APY.`}{' '}
-        APY is variable.
+        APY is variable and these projections are not guaranteed.
         {estimate.termEndsBeforeYear && ` The ${termDays}-day term ends before a full year, so the yearly figure is annualised.`}
       </p>
     </div>

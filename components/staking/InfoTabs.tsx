@@ -7,8 +7,12 @@ import { LINKS } from '@/lib/config';
 
 const FAQS: [string, string][] = [
   [
+    'What are the risks of staking?',
+    'Digital assets are volatile and holding ADI Token carries risk of loss. Staked positions are locked for the full term and cannot be accessed early, including during market movements. Rewards are variable and depend on total pool participation. Onchain contracts also carry technical risk. This content is for informational purposes and is not financial advice; please do your own research and consider your own circumstances before acquiring ADI Token.',
+  ],
+  [
     'What happens to my ADI after I stake?',
-    'Staked ADI is transferred to the staking contract and locked for the selected term. Your position is recorded onchain against your wallet address. Principal is returned at maturity, at which point accrued rewards also become claimable.',
+    'Staked ADI is transferred to the staking contract and locked for the selected term. Your position is recorded onchain against your wallet address. The contract releases principal at maturity, at which point accrued rewards also become claimable — subject, as with any onchain protocol, to the contract performing as designed.',
   ],
   [
     'Is the APY fixed or variable?',
@@ -20,7 +24,7 @@ const FAQS: [string, string][] = [
   ],
   [
     'Can I unstake early?',
-    'No. Positions are non-withdrawable until the selected lock term ends. Principal is released at maturity, at which point accrued rewards also become claimable.',
+    'No. Positions are non-withdrawable until the selected lock term ends, including during periods of market volatility. The contract releases principal at maturity, at which point accrued rewards also become claimable.',
   ],
   [
     'What happens at program end?',
