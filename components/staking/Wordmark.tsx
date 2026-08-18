@@ -4,9 +4,12 @@ import { useEffect, useState } from 'react';
 
 /**
  * The brand mark is never redrawn in code — it is loaded from public/.
- * SVG is preferred; a transparent PNG is accepted as a fallback so whichever
- * format is supplied simply works. Until one is present the wordmark stands
- * alone in type.
+ * SVG is preferred; a PNG is accepted so whichever format is supplied simply
+ * works. Until one is present the wordmark stands alone in type.
+ *
+ * The corner radius is what makes a mark with its own background plate read as
+ * a deliberate app tile rather than a broken cutout. A transparent asset would
+ * not need it, but it costs nothing when one arrives.
  *
  * The asset is probed rather than rendered-then-caught, so its absence never
  * flashes a broken-image glyph.
@@ -37,7 +40,13 @@ export function Wordmark() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       {markSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={markSrc} alt="" width={28} height={28} style={{ display: 'block', flexShrink: 0 }} />
+        <img
+          src={markSrc}
+          alt=""
+          width={28}
+          height={28}
+          style={{ display: 'block', flexShrink: 0, borderRadius: 7 }}
+        />
       ) : (
         <span
           title="Add the brand mark at public/adi-mark.svg"
