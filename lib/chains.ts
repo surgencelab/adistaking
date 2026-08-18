@@ -3,25 +3,24 @@ import { defineChain } from 'viem';
 /**
  * ADI Chain.
  *
- * PLACEHOLDER — no chain id, RPC, or explorer was supplied with the design
- * handoff. Everything below is env-driven so this is a one-file swap:
+ * Fully environment-driven, so pointing the app at the network is a config
+ * change rather than a code change:
  *
  *   NEXT_PUBLIC_CHAIN_ID
  *   NEXT_PUBLIC_CHAIN_NAME
  *   NEXT_PUBLIC_RPC_URL
  *   NEXT_PUBLIC_EXPLORER_URL
  *
- * The default falls back to Ethereum mainnet (1) so wallet connection, network
- * detection, and the "switch network" flow are genuinely exercisable today
- * rather than permanently stuck on a wrong-network banner. Replace the env
- * values with ADI Chain's real ones before shipping.
+ * Unset, these fall back to Ethereum mainnet so wallet connection, network
+ * detection, and the switch-network flow stay exercisable in local development
+ * instead of sitting permanently on a wrong-network banner.
  */
 export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 1);
 export const CHAIN_NAME = process.env.NEXT_PUBLIC_CHAIN_NAME ?? 'ADI Chain';
 export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? 'https://eth.llamarpc.com';
 export const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL ?? 'https://etherscan.io';
 
-/** True while the chain is still the mainnet stand-in rather than ADI Chain. */
+/** True while the chain is still the development fallback rather than ADI Chain. */
 export const CHAIN_IS_PLACEHOLDER = !process.env.NEXT_PUBLIC_CHAIN_ID;
 
 export const adiChain = defineChain({

@@ -21,8 +21,8 @@ export const MOCK_MODE = STAKING_ADDRESS === ZERO || TOKEN_ADDRESS === ZERO;
 export const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? '';
 
 /* ── Program parameters ──────────────────────────────────────────────────────
- * Eyeballed from the design handoff screenshots. Once the staking contract is
- * live these should be read from it (see usePool) rather than hardcoded. */
+ * Defaults for local development. Once the staking contract is live these are
+ * read from it (see usePool) rather than from this file. */
 
 export const TOKEN_SYMBOL = 'ADI';
 export const TOKEN_DECIMALS = 18;
@@ -45,8 +45,7 @@ export const EXAMPLE_STAKE = 1_000;
 /** Rough network fee hint shown under the stake form. */
 export const EST_NETWORK_FEE = '~0.0004 ADI';
 
-/* ── External links ─────────────────────────────────────────────────────────
- * Placeholder hrefs from the handoff footer. Replace with real destinations. */
+/* ── External links ────────────────────────────────────────────────────────── */
 export const LINKS = {
   terms: '#',
   docs: '#',

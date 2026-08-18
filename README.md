@@ -1,17 +1,19 @@
 # ADI Staking
 
-Production Next.js app for the ADI staking page, built from the **ADI Staking Design System**
-handoff. Dark navy surfaces, electric blue `#2E5BFF` for interaction only, teal `#2BE4C0`
-for data only, condensed uppercase pill buttons, Archivo display type.
+The staking interface for the ADI token programme on ADI Chain. Next.js 16, wagmi v3,
+viem. Dark navy surfaces, electric blue `#2E5BFF` for interaction, teal `#2BE4C0` for data,
+condensed uppercase pill buttons, Archivo display type.
 
 ```bash
-npm run dev    # http://localhost:3025
+npm install
+npm run dev      # http://localhost:3025
 npm run build
 ```
 
-## Where the real contracts plug in
+## Configuration
 
-The app runs today against a mock data layer. **One file switches it to the chain:**
+The app reads live contract state when addresses are configured, and serves a local data
+layer when they are not. **Two variables decide which:**
 
 ```bash
 # .env.local
@@ -21,41 +23,46 @@ NEXT_PUBLIC_TOKEN_ADDRESS=0x…
 
 `lib/config.ts` derives `MOCK_MODE` from those two values. Every hook in `lib/hooks/`
 branches on it and returns the identical shape either way, so **no component knows which
-side it is on**. Setting the addresses also removes the demo wallet connector and the
-Demo States bar automatically.
+side it is on**. Configuring them also removes the demo connector and the Demo States bar.
 
-When you flip it, expect to touch exactly three things:
+Full variable list in `.env.example`:
 
-| File | What to reconcile |
+| Variable | Purpose |
 |---|---|
-| `lib/contracts.ts` | The staking ABI is **derived from what the UI needs**, not from a real artifact. Reconcile function names and output shapes against the deployed ABI. |
-| `lib/hooks/usePoolData.ts` | `tvlUsd` returns `0` in live mode — there is no price oracle in the staking contract. Wire a price feed. |
-| `lib/hooks/usePoolData.ts` | `useActivity` and `useVolume` need an indexer (subgraph or Dune); no contract read covers them, so they stay on mock until that exists. |
+| `NEXT_PUBLIC_STAKING_ADDRESS` | Staking contract. Enables live reads and writes. |
+| `NEXT_PUBLIC_TOKEN_ADDRESS` | ERC-20 $ADI. Enables balance and allowance reads. |
+| `NEXT_PUBLIC_CHAIN_ID` | ADI Chain id. Falls back to Ethereum mainnet in development. |
+| `NEXT_PUBLIC_CHAIN_NAME` | Display name in the network badge and banners. |
+| `NEXT_PUBLIC_RPC_URL` | RPC endpoint for contract reads. |
+| `NEXT_PUBLIC_EXPLORER_URL` | Base URL for address and transaction links. |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Optional. Without it, injected + Coinbase only. |
 
-Delete `lib/mock.ts` once you no longer need the review build. Nothing outside `lib/hooks/`
-and `components/staking/DemoBar.tsx` imports it.
+### Going live
 
-## ADI Chain
+Three things to settle when the contracts are deployed:
 
-No chain id, RPC, or explorer was supplied. `lib/chains.ts` is env-driven and **falls back
-to Ethereum mainnet** so wallet connection, network detection, and switch-network are
-genuinely exercisable today rather than permanently stuck on a wrong-network banner.
+| File | What to do |
+|---|---|
+| `lib/contracts.ts` | Reconcile the staking ABI against the deployed contract. Nothing outside this file and `lib/hooks/` references an ABI. |
+| `lib/hooks/usePoolData.ts` | `tvlUsd` returns `0` without a price oracle — wire a price feed. |
+| `lib/hooks/usePoolData.ts` | `useActivity` and `useVolume` need an indexer (subgraph or Dune); no contract read covers pool-wide history. |
 
-```bash
-NEXT_PUBLIC_CHAIN_ID=
-NEXT_PUBLIC_CHAIN_NAME=ADI Chain
-NEXT_PUBLIC_RPC_URL=
-NEXT_PUBLIC_EXPLORER_URL=
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=   # optional; without it, injected + Coinbase only
-```
+Then delete `lib/mock.ts`.
+
+## Deployment
+
+Deploys to Vercel with no additional configuration — it is a standard Next.js App Router
+project. Set the variables above in **Project Settings → Environment Variables** before the
+first production deploy; they are all `NEXT_PUBLIC_*`, so they are baked in at build time
+and a change requires a redeploy.
 
 ## Disclosure phases
 
-Derived from real state, not a toggle — `components/staking/StakingPage.tsx`:
+Derived from real state rather than a toggle — `components/staking/StakingPage.tsx`:
 
 | Phase | Condition | Shows |
 |---|---|---|
-| **explore** | disconnected | Pool cap / APY / program window. Stakers, avg lock, stat tiles and pool activity gated behind connect. |
+| **explore** | disconnected | Pool cap, APY, programme window. Stakers, average lock, stat tiles and pool activity gated behind connect. |
 | **stake** | connected, no positions | Pool basics, minimum stake (100 ADI), per-term APY. Pool activity still gated. |
 | **manage** | connected with positions | Positions table with actions, volume chart, full pool composition and recent activity. |
 
@@ -63,37 +70,34 @@ Derived from real state, not a toggle — `components/staking/StakingPage.tsx`:
 
 `components/staking/EarningsEstimate.tsx` sits in the stake form between the summary rows
 and the CTA — per month and per year at the selected term's APY, read before committing to
-an amount.
+an amount. Before an amount is typed it previews against the connected wallet's balance,
+falling back to `EXAMPLE_STAKE`, and says which it used.
 
-Before an amount is typed it previews against the connected wallet's balance, falling back
-to `EXAMPLE_STAKE` (1,000 ADI) when disconnected, and says which it used. All four figures
-— per month, per year, at maturity, and predicted APY — come from one function,
-`estimateEarnings` in `lib/earnings.ts`, so the stake form's "Est. rewards" row can never
-drift from the panel.
-
-The per-year figure is annualised, not attainable, on any term shorter than a year; the
-caption says so, and pairs it with the standing "APY is variable" caveat from the FAQ.
+All four figures — per month, per year, at maturity, and predicted APY — come from
+`estimateEarnings` in `lib/earnings.ts`, so the summary row and the panel cannot drift. The
+per-year figure is annualised, not attainable, on any term shorter than a year; the caption
+says so.
 
 ## Layout
 
 ```
 app/
-  layout.tsx          fonts, theme boot script, providers
+  layout.tsx          fonts, theme boot, providers
   page.tsx
   globals.css         layout grids, breakpoints, light-theme contrast corrections
-  styles/             design-system tokens, copied verbatim — safe to re-sync
+  styles/             design-system tokens — re-syncable from source, do not edit
 components/
-  ui/                 19 design-system components, ported to typed TSX
+  ui/                 design-system components as typed TSX
   staking/            page sections
   providers/          wagmi + react-query, toasts
 lib/
-  config.ts           ← the swap point
-  chains.ts  wagmi.ts  contracts.ts  format.ts  types.ts  mock.ts
+  config.ts           mock/live switch and programme parameters
+  chains.ts  wagmi.ts  contracts.ts  earnings.ts  figures.ts  format.ts  types.ts  mock.ts
   hooks/              one hook per read; useStakeActions for every write
 ```
 
-`app/styles/` is a verbatim copy of the handoff's `tokens/`. Corrections live in
-`globals.css` instead, so re-copying the design system's tokens never silently undoes them.
+`app/styles/` is a verbatim copy of the design system's tokens. Corrections live in
+`globals.css` instead, so re-syncing tokens never silently undoes them.
 
 ## Craft notes
 
@@ -101,49 +105,29 @@ Decisions that carry the page's feel, so they survive future edits:
 
 - **Two-tone numerals** (`components/ui/Figure.tsx`). Every figure splits into a value and
   a subordinate unit — `12,847` at full contrast, `ADI` stepped back in size, weight, and
-  colour. The brand rule that numbers always carry units is kept without letting the unit
-  compete with the number. Use `Figure` for any new number; do not hand-set one.
+  colour. Numbers always carry their units without the unit competing with the number. Use
+  `Figure` for any new number; do not hand-set one.
 - **Scale contrast carries hierarchy.** Stat figures run at 42px against 11px labels. The
   labels are deliberately quiet — if everything is emphasised, nothing is.
 - **Dual denomination** where a second unit is meaningful: `$3.24M` over `251,415 ADI at
   the current price`.
-- **No legend squares.** Series keys use thin rounded line swatches matching the stroke,
-  not `■` glyphs.
+- **No legend squares.** Series keys use thin rounded line swatches matching the stroke.
 - **The CTA names the blocker** — "Enter an amount", "Minimum 100 ADI", "Insufficient
   balance" — instead of failing on click. The step hint only appears once there is
   something submittable, so it never contradicts the button.
 - **The chart is interactive**, not decorative: range control, crosshair, floating readout,
   and a header figure that tracks the hovered point.
-- **No developer scaffolding in the UI.** Notes about indexers and placeholder data belong
-  in this file, not on the page.
-
-## Deviations from the handoff, and why
-
-- **Light theme contrast.** The handoff flags its light palette as extrapolated from
-  dark-only screenshots ("verify before shipping"). Two tokens fail WCAG AA on white:
-  `--text-faint` (~2.5:1) and `--positive` used as text (~2.1:1). Corrected in
-  `globals.css` for light mode only. `--teal-400` is untouched, so progress bars and the
-  composition ramp keep their data colour.
-- **Icons are Lucide**, per the handoff's iconography rule, replacing the kit's text
-  glyphs (✓ ⓘ ▾ ✕).
-- **The wallet address button is not uppercased.** Every other pill button is, per the
-  brand rule, but addresses are checksummed and uppercasing corrupts the casing.
-- **Mobile grid overflow fixed.** Grid items default to `min-width: auto`, so the
-  positions table's `min-width: 680px` pushed the whole column past the viewport instead
-  of scrolling inside `.adi-scroll`.
-- **Hero type scales down below 560px** (56px wrapped to three lines on a phone).
-- **A shared clock (`lib/hooks/useNow.ts`)** drives countdowns and lock progress. Reading
+- **The wallet address is not uppercased.** Every other pill button is, per the brand rule,
+  but addresses are checksummed and uppercasing corrupts the casing.
+- **A shared clock** (`lib/hooks/useNow.ts`) drives countdowns and lock progress. Reading
   `Date.now()` during render is impure and only advances when something else re-renders;
-  this also makes the "next unlock" countdown tick on its own.
+  this also makes the countdown tick on its own.
+- **Grid children carry `min-width: 0`.** Grid items default to `min-width: auto`, which
+  would let the positions table's minimum width push past the viewport instead of scrolling
+  inside `.adi-scroll`.
 
-## Still needed from you
+## Assets
 
-1. **The logo.** The real mark is an orange/blue diamond; the brand rule is never to
-   redraw it. `components/staking/Wordmark.tsx` renders the wordmark in type with a dashed
-   placeholder and probes for `public/adi-mark.svg` — drop the file in and it appears.
-2. **Brand fonts.** Archivo / Archivo Narrow / IBM Plex Mono are Google-font stand-ins.
-   Swap them in `app/layout.tsx`.
-3. **Hex values.** Every colour was eyeballed from screenshots. Check `app/styles/colors.css`
-   against the app's real config.
-4. **Footer link destinations** — `LINKS` in `lib/config.ts` still carries placeholder hrefs
-   for terms, docs, audits, and Dune.
+The brand mark loads from `public/adi-mark.svg` and is never redrawn in code; until that
+file is present the wordmark stands alone in type. Archivo, Archivo Narrow, and IBM Plex
+Mono are loaded via `next/font` in `app/layout.tsx`.

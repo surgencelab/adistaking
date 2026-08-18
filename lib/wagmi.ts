@@ -3,7 +3,7 @@ import { coinbaseWallet, injected, mock, walletConnect } from 'wagmi/connectors'
 import { adiChain, CHAIN_ID, RPC_URL } from './chains';
 import { MOCK_MODE, WALLETCONNECT_PROJECT_ID } from './config';
 
-/** Address used by the demo connector — matches the handoff screenshots. */
+/** Address used by the demo connector in local development. */
 export const DEMO_ADDRESS = '0x9A4f2C81b7d14E09Af33517Cc2Ba55e0d19FB221' as const;
 
 /**
@@ -12,8 +12,8 @@ export const DEMO_ADDRESS = '0x9A4f2C81b7d14E09Af33517Cc2Ba55e0d19FB221' as cons
  * WalletConnect only registers when a project id is configured.
  *
  * While MOCK_MODE is on, a demo connector is offered too, so the connected and
- * staked phases are reviewable without a wallet or a deployed contract. It
- * disappears the moment real contract addresses are configured.
+ * staked phases are reviewable without a wallet. It disappears the moment real
+ * contract addresses are configured.
  */
 const connectors = [
   injected(),

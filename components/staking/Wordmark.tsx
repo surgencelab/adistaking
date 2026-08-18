@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react';
 const MARK_SRC = '/adi-mark.svg';
 
 /**
- * The real mark is an orange/blue diamond. No asset was supplied and the brand
- * rule is never to redraw it — so this renders the wordmark in type with a
- * placeholder slot. Drop the file at public/adi-mark.svg and it appears.
+ * The brand mark is never redrawn in code — it is loaded from
+ * public/adi-mark.svg. Until that file is present the wordmark stands alone in
+ * type.
  *
- * The asset is probed rather than rendered-then-caught, so a missing file never
+ * The asset is probed rather than rendered-then-caught, so its absence never
  * flashes a broken-image glyph.
  */
 export function Wordmark() {
@@ -28,7 +28,7 @@ export function Wordmark() {
         <img src={MARK_SRC} alt="" width={28} height={28} style={{ display: 'block' }} />
       ) : (
         <span
-          title="Logo asset not provided — drop the SVG at public/adi-mark.svg"
+          title="Add the brand mark at public/adi-mark.svg"
           style={{
             width: 28,
             height: 28,

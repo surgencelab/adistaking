@@ -14,11 +14,10 @@
 }
 
 /* Light-theme contrast corrections.
-   The handoff flags the light palette as extrapolated from dark-only screenshots
-   ("verify before shipping"). Two of its tokens fail WCAG AA on white:
-   --text-faint (~2.5:1) and --positive used as text (~2.1:1). Corrected here
-   rather than in app/styles/colors.css so re-syncing the design system's tokens
-   does not silently undo it. --teal-400 is untouched, so progress bars and the
+   Two tokens need adjusting to clear WCAG AA on white: --text-faint and
+   --positive when used as text. Corrected here rather than in
+   app/styles/colors.css so re-syncing the design system's tokens does not
+   silently undo it. --teal-400 is untouched, so progress bars and the
    composition ramp keep their data colour. */
 :root[data-theme="light"] {
   --text-faint: #6F7890;

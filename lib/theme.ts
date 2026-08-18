@@ -22,7 +22,7 @@ export function getTheme(): Theme {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 }
 
-/** Dark is primary; light is the extrapolated theme flagged in the handoff. */
+/** Dark is the primary theme. */
 export const getServerTheme = (): Theme => 'dark';
 
 export function setTheme(theme: Theme) {

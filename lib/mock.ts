@@ -12,10 +12,9 @@ import type {
 /**
  * Mock data layer.
  *
- * Everything here is figures lifted from the design handoff screenshots. It is
- * a mutable in-memory store so claim / restake / unstake visibly change state
- * during a session, the same way the real contract would. Delete this file the
- * day NEXT_PUBLIC_STAKING_ADDRESS is set — nothing outside lib/hooks imports it.
+ * A mutable in-memory store, so claim / restake / unstake visibly change state
+ * during a session the same way the real contract would. Delete this file once
+ * NEXT_PUBLIC_STAKING_ADDRESS is set — nothing outside lib/hooks imports it.
  *
  * Position seed dates are relative to "now" so every UI state (early, mid-term,
  * matured) is reachable whenever the page is opened. That means a seeded

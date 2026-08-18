@@ -1,15 +1,15 @@
 /**
  * Contract interfaces.
  *
- * No ABI was supplied with the handoff. The staking ABI below is derived from
- * what the UI actually needs — read it as a specification of the surface this
- * page depends on, and reconcile it against the real ABI when it lands:
+ * The staking ABI below is the specification of the contract surface this page
+ * depends on:
  *
  *   reads   poolInfo, positionsOf, programStats, compositionOf
  *   writes  stake, claim, unstake, restake
  *
- * If the real contract names things differently, change the names here and in
- * lib/hooks — no component references an ABI directly.
+ * Reconcile it against the deployed ABI before going live. If the contract
+ * names things differently, change the names here and in lib/hooks — no
+ * component references an ABI directly, so the blast radius stays in this file.
  */
 
 export const erc20Abi = [
