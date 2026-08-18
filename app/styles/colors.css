@@ -1,0 +1,30 @@
+:root{
+/* base — navy ink */
+--navy-1000:#03050A;--navy-950:#05070D;--navy-900:#070B14;--navy-850:#0A0F19;--navy-800:#0D1320;--navy-700:#121A2A;--navy-600:#1B2436;--navy-500:#28334A;
+/* base — blue accent */
+--blue-300:#7D9BFF;--blue-400:#4D74FF;--blue-500:#2E5BFF;--blue-600:#2149D6;--blue-700:#1A3AAB;
+/* base — teal (progress / positive) */
+--teal-300:#6FF0D2;--teal-400:#2BE4C0;--teal-500:#17CDA9;--green-500:#22C98D;
+/* base — other hues */
+--red-500:#F05A5A;--amber-500:#E8A33D;
+/* text */
+--text-heading:#F2F5FA;--text-body:#B9C1D0;--text-muted:#8A93A6;--text-faint:#5A6377;--text-on-accent:#FFFFFF;--text-accent:var(--blue-400);
+/* surfaces */
+--surface-page:var(--navy-950);--surface-card:var(--navy-850);--surface-raised:var(--navy-800);--surface-inset:var(--navy-900);--surface-row:var(--navy-900);--surface-track:#1E2634;
+/* borders */
+--border-subtle:rgba(242,245,250,0.06);--border-strong:rgba(242,245,250,0.14);--border-accent:rgba(46,91,255,0.5);--border-selected:#F2F5FA;
+/* accent */
+--accent:var(--blue-500);--accent-hover:var(--blue-400);--accent-press:var(--blue-600);--accent-tint:rgba(46,91,255,0.14);
+/* status */
+--positive:var(--teal-400);--positive-strong:var(--green-500);--positive-tint:rgba(43,228,192,0.12);--negative:var(--red-500);--negative-tint:rgba(240,90,90,0.12);--warning:var(--amber-500);--warning-tint:rgba(232,163,61,0.12);--info:var(--blue-400);--info-tint:rgba(77,116,255,0.14);
+/* focus */
+--focus-ring:0 0 0 2px var(--surface-page),0 0 0 4px var(--blue-500);
+}
+[data-theme="light"]{
+--text-heading:#0B1220;--text-body:#333D52;--text-muted:#66708A;--text-faint:#98A1B6;--text-on-accent:#FFFFFF;--text-accent:var(--blue-600);
+--surface-page:#F4F6FA;--surface-card:#FFFFFF;--surface-raised:#FFFFFF;--surface-inset:#EDF0F6;--surface-row:#F0F3F8;--surface-track:#E2E7F0;
+--border-subtle:rgba(11,18,32,0.08);--border-strong:rgba(11,18,32,0.16);--border-accent:rgba(46,91,255,0.45);--border-selected:#0B1220;
+--accent:var(--blue-500);--accent-hover:var(--blue-600);--accent-press:var(--blue-700);--accent-tint:rgba(46,91,255,0.1);
+--positive:var(--teal-500);--positive-tint:rgba(23,205,169,0.12);
+--focus-ring:0 0 0 2px var(--surface-page),0 0 0 4px var(--blue-500);
+}

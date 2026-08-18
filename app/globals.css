@@ -1,49 +1,77 @@
+@import './styles/colors.css';
+@import './styles/typography.css';
+@import './styles/spacing.css';
+@import './styles/effects.css';
+@import './styles/base.css';
+
+/* Font tokens are bound to next/font variables set on <html> in layout.tsx.
+   The token files ship Google-font stand-ins; see readme substitution flag #1. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-condensed: var(--font-archivo-narrow), var(--font-archivo), sans-serif;
+  --font-body: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Light-theme contrast corrections.
+   The handoff flags the light palette as extrapolated from dark-only screenshots
+   ("verify before shipping"). Two of its tokens fail WCAG AA on white:
+   --text-faint (~2.5:1) and --positive used as text (~2.1:1). Corrected here
+   rather than in app/styles/colors.css so re-syncing the design system's tokens
+   does not silently undo it. --teal-400 is untouched, so progress bars and the
+   composition ramp keep their data colour. */
+:root[data-theme="light"] {
+  --text-faint: #6F7890;
+  --positive: #0B8B72;
 }
 
-html {
-  height: 100%;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background var(--dur-base) var(--ease-standard),
+              color var(--dur-base) var(--ease-standard);
 }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+button, input, select { font-family: inherit; }
+
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+
+/* ── page layout grids (from the UI kit) ───────────────────────────── */
+.adi-shell { max-width: var(--container-max); margin: 0 auto; padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; }
+.adi-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+.adi-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.adi-main { display: grid; grid-template-columns: 1.9fr 1fr; gap: 20px; }
+.adi-how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.adi-scroll { overflow-x: auto; }
+
+/* Grid items default to min-width:auto, so the positions table's min-width
+   would push the whole column wider than the viewport instead of scrolling
+   inside .adi-scroll. */
+.adi-main > *, .adi-hero > * { min-width: 0; }
+
+@media (max-width: 980px) {
+  .adi-hero, .adi-main { grid-template-columns: 1fr; }
+  .adi-tiles, .adi-how { grid-template-columns: 1fr 1fr; }
+  .adi-nav { padding: 14px 18px !important; }
+}
+@media (max-width: 700px) {
+  /* Wordmark + theme + chain badge + address stop fitting on one row. */
+  .adi-nav { flex-wrap: wrap; row-gap: 12px; }
+  .adi-nav > * { flex: 1 1 auto; }
+}
+@media (max-width: 560px) {
+  /* 56px display type wraps to three lines on a phone — only the hero uses 4xl. */
+  :root { --text-4xl: 38px; }
+  .adi-tiles, .adi-how { grid-template-columns: 1fr; }
+  .adi-shell { padding: 20px 14px; }
+  .adi-hero { padding: 28px 20px !important; }
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+@keyframes adiShimmer { 0% { opacity: .45 } 50% { opacity: 1 } 100% { opacity: .45 } }
+@keyframes adiFadeUp { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+@keyframes adiSpin { to { transform: rotate(360deg) } }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
