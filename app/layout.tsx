@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { Archivo, Archivo_Narrow, IBM_Plex_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers/Providers';
 import { THEME_BOOT_SCRIPT } from '@/lib/theme';
+import { MOCK_MODE } from '@/lib/config';
 import './globals.css';
 
 const archivo = Archivo({
@@ -28,6 +29,8 @@ export const metadata: Metadata = {
   title: 'ADI Staking',
   description:
     'The $ADI staking program allocates a fixed ecosystem participation incentive to time-locked positions on ADI Chain.',
+  // A preview build serves sample figures — keep it out of search results.
+  robots: MOCK_MODE ? { index: false, follow: false } : undefined,
 };
 
 export const viewport: Viewport = {

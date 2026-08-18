@@ -18,6 +18,7 @@ import { PoolComposition } from './PoolComposition';
 import { InfoTabs } from './InfoTabs';
 import { Footer } from './Footer';
 import { DemoBar, type DemoState } from './DemoBar';
+import { PreviewBanner } from './PreviewBanner';
 
 /**
  * Three disclosure phases, derived from real state rather than a toggle:
@@ -43,6 +44,7 @@ export function StakingPage() {
 
   return (
     <>
+      {MOCK_MODE && <PreviewBanner />}
       <Nav onConnect={() => setConnectOpen(true)} />
 
       <main className="adi-shell">
