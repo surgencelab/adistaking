@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { Card, Tabs } from '@/components/ui';
 import { LINKS } from '@/lib/config';
 
@@ -58,6 +58,8 @@ const STEPS: [string, ReactNode][] = [
 
 export function InfoTabs() {
   const [tab, setTab] = useState<'faq' | 'how'>('faq');
+  // One answer open at a time — the list stays scannable instead of becoming a wall.
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
     <Card>
@@ -71,15 +73,59 @@ export function InfoTabs() {
       />
 
       {tab === 'faq' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {FAQS.map(([question, answer]) => (
-            <div key={question} style={{ background: 'var(--surface-row)', borderRadius: 'var(--radius-md)', padding: '14px 18px' }}>
-              <div style={{ font: '600 14px var(--font-body)', color: 'var(--text-heading)', marginBottom: 4 }}>
-                {question}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {FAQS.map(([question, answer], i) => {
+            const isOpen = open === i;
+            return (
+              <div key={question} style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border-subtle)' }}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 16,
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '18px 2px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    font: '600 15px var(--font-body)',
+                    color: isOpen ? 'var(--text-heading)' : 'var(--text-body)',
+                    transition: 'color var(--dur-fast) var(--ease-standard)',
+                  }}
+                >
+                  {question}
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={2}
+                    style={{
+                      flexShrink: 0,
+                      color: 'var(--text-faint)',
+                      transform: isOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform var(--dur-base) var(--ease-standard)',
+                    }}
+                  />
+                </button>
+                {isOpen && (
+                  <p
+                    style={{
+                      font: 'var(--type-small)',
+                      color: 'var(--text-muted)',
+                      margin: '0 0 20px',
+                      maxWidth: '68ch',
+                      animation: 'adiFadeUp var(--dur-base) var(--ease-standard)',
+                    }}
+                  >
+                    {answer}
+                  </p>
+                )}
               </div>
-              <div style={{ font: 'var(--type-small)', color: 'var(--text-muted)' }}>{answer}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

@@ -1,8 +1,10 @@
 'use client';
 
+import { Figure } from '@/components/ui';
 import type { Position } from '@/lib/types';
-import { formatAdi } from '@/lib/format';
+import { adiFigure } from '@/lib/figures';
 import { PoolOverview } from './PoolOverview';
+import { HeroMeta } from './HeroMeta';
 
 export function Hero({
   locked,
@@ -17,10 +19,10 @@ export function Hero({
   const accrued = positions.reduce((sum, p) => sum + p.rewards, 0);
   const claimable = positions.filter((p) => p.matured).reduce((sum, p) => sum + p.rewards, 0);
 
-  const summary: [string, string, boolean][] = [
-    ['Your staked', formatAdi(staked), false],
-    ['Rewards accumulated', formatAdi(accrued, 1), false],
-    ['Claimable', formatAdi(claimable, 1), true],
+  const summary = [
+    { label: 'Your staked', figure: adiFigure(staked), positive: false },
+    { label: 'Rewards accumulated', figure: adiFigure(accrued, 1), positive: false },
+    { label: 'Claimable', figure: adiFigure(claimable, 1), positive: true },
   ];
 
   return (
@@ -33,7 +35,7 @@ export function Hero({
         padding: 44,
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <h1
           style={{
             font: 'var(--type-hero)',
@@ -44,35 +46,42 @@ export function Hero({
         >
           Stake <span style={{ color: 'var(--blue-500)' }}>ADI</span>
         </h1>
-        <p style={{ font: 'var(--type-body)', color: 'var(--text-muted)', margin: 0, maxWidth: 460 }}>
+
+        <div style={{ marginTop: 18 }}>
+          <HeroMeta />
+        </div>
+
+        <p style={{ font: 'var(--type-body)', color: 'var(--text-muted)', margin: '22px 0 0', maxWidth: 460 }}>
           The $ADI staking program allocates a fixed ecosystem participation incentive to time-locked positions on ADI
           Chain. Each position&rsquo;s share is weighted by lock duration, with principal and accrued rewards released
           at maturity.
         </p>
+
         {positions.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 36, marginTop: 6 }}>
-            {summary.map(([label, value, positive]) => (
-              <div key={label}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '20px 40px',
+              marginTop: 34,
+              paddingTop: 28,
+              borderTop: '1px solid var(--border-subtle)',
+              width: '100%',
+            }}
+          >
+            {summary.map((s) => (
+              <div key={s.label} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div
                   style={{
                     font: 'var(--type-label)',
                     color: 'var(--text-muted)',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
+                    letterSpacing: 'var(--tracking-caps)',
                   }}
                 >
-                  {label}
+                  {s.label}
                 </div>
-                <div
-                  style={{
-                    font: 'var(--type-figure)',
-                    color: positive ? 'var(--positive)' : 'var(--text-heading)',
-                    textTransform: 'uppercase',
-                    marginTop: 4,
-                  }}
-                >
-                  {value}
-                </div>
+                <Figure figure={s.figure} size="lg" tone={s.positive ? 'positive' : 'default'} />
               </div>
             ))}
           </div>

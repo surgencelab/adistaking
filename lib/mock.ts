@@ -110,6 +110,7 @@ export const mock = {
       nextUnlockAt,
       nextUnlockAmount: soonest?.amount ?? 4_200,
       tvlUsd: 3_240_000,
+      tvlAdi: store.poolStaked,
     };
   },
 
@@ -131,15 +132,36 @@ export const mock = {
     ];
   },
 
+  /** Daily series from program start to today. Deterministic — a seeded wobble
+   *  rather than Math.random, so the line does not jump on every refetch. */
   volume(): VolumePoint[] {
-    const staked = [4, 9, 15, 24, 31, 42, 55, 61, 74, 83, 95, 100];
-    const rewards = [0, 1, 2.5, 4, 6, 9, 12.5, 16, 20, 25, 30.5, 36];
-    const span = PROGRAM_END.getTime() - PROGRAM_START.getTime();
-    return staked.map((s, i) => ({
-      at: new Date(PROGRAM_START.getTime() + (span * i) / (staked.length - 1)),
-      cumulativeStaked: (s / 100) * store.poolStaked,
-      rewardsEarned: (rewards[i] / 100) * store.poolStaked,
-    }));
+    const wobble = (i: number) => {
+      const x = Math.sin(i * 12.9898) * 43_758.5453;
+      return x - Math.floor(x);
+    };
+    const days = Math.max(
+      2,
+      Math.floor((Date.now() - PROGRAM_START.getTime()) / DAY_MS) + 1,
+    );
+    const points: VolumePoint[] = [];
+    for (let i = 0; i < days; i++) {
+      const t = i / (days - 1);
+      // Fast early ramp that flattens as the pool fills, plus a small daily wobble.
+      const curve = 1 - Math.pow(1 - t, 2.2);
+      const staked = store.poolStaked * (curve * 0.94 + wobble(i) * 0.06);
+      points.push({
+        at: new Date(PROGRAM_START.getTime() + i * DAY_MS),
+        cumulativeStaked: staked,
+        rewardsEarned: staked * 0.18 * t,
+      });
+    }
+    // End the series on the live figure so the chart and the header agree.
+    points[points.length - 1] = {
+      at: new Date(),
+      cumulativeStaked: store.poolStaked,
+      rewardsEarned: store.poolStaked * 0.18,
+    };
+    return points;
   },
 
   positions(): Position[] {

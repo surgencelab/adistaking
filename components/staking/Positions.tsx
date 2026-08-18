@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { Button, Card, Checkbox, Dialog, ProgressBar, Skeleton } from '@/components/ui';
+import { Button, Card, Checkbox, Dialog, Figure, ProgressBar, Skeleton } from '@/components/ui';
 import { useToast } from '@/components/providers/ToastProvider';
 import { useStakeActions } from '@/lib/hooks/useStakeActions';
 import { DEFAULT_TERM_DAYS } from '@/lib/config';
-import { formatAdi, formatDateShort, formatNumber } from '@/lib/format';
+import { formatDateShort, formatNumber } from '@/lib/format';
+import { adiFigure } from '@/lib/figures';
 import type { LockTermDays, Position } from '@/lib/types';
 
 type Action = 'claim' | 'restake' | 'unstake';
@@ -201,21 +202,19 @@ export function Positions({ positions, isLoading }: { positions: Position[]; isL
                 borderRadius: 'var(--radius-md)',
                 padding: '13px 16px',
                 minWidth: 680,
+                transition: 'border-color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard)',
+              }}
+              onMouseEnter={(e) => {
+                if (!selected[p.id]) e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              }}
+              onMouseLeave={(e) => {
+                if (!selected[p.id]) e.currentTarget.style.borderColor = 'transparent';
               }}
             >
-              <span style={{ font: '700 15px var(--font-condensed)', color: 'var(--text-heading)' }}>
-                {formatAdi(p.amount)}
-              </span>
+              <Figure figure={adiFigure(p.amount)} size="sm" />
               <span style={{ font: 'var(--type-small)', color: 'var(--text-body)' }}>{p.multiplier.toFixed(2)}x</span>
               <span style={{ font: 'var(--type-small)', color: 'var(--text-body)' }}>{formatDateShort(p.openedAt)}</span>
-              <span
-                style={{
-                  font: '700 14px var(--font-condensed)',
-                  color: p.rewards ? 'var(--positive)' : 'var(--text-faint)',
-                }}
-              >
-                {formatNumber(p.rewards, 1)} ADI
-              </span>
+              <Figure figure={adiFigure(p.rewards, 1)} size="sm" tone={p.rewards ? 'positive' : 'muted'} />
               <ProgressBar value={p.progressPct} height={6} label={`${p.termDays}-day lock progress`} />
               <span style={{ font: 'var(--type-small)', color: p.matured ? 'var(--positive)' : 'var(--text-body)' }}>
                 {p.matured ? 'Matured' : formatDateShort(p.maturesAt)}

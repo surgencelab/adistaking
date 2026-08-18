@@ -1,8 +1,8 @@
 'use client';
 
-import { Tooltip } from '@/components/ui';
-import { TOKEN_SYMBOL } from '@/lib/config';
-import { formatAdiAuto, formatNumber } from '@/lib/format';
+import { Figure, Tooltip } from '@/components/ui';
+import { formatAdiAuto } from '@/lib/format';
+import { adiFigure } from '@/lib/figures';
 import type { EarningsEstimate as Estimate } from '@/lib/earnings';
 
 /**
@@ -84,9 +84,7 @@ export function EarningsEstimate({
             >
               {label}
             </span>
-            <span style={{ font: '700 18px var(--font-condensed)', color: 'var(--positive)' }}>
-              ~{formatNumber(value, 1)} {TOKEN_SYMBOL}
-            </span>
+            <Figure figure={{ ...adiFigure(value, 1), value: `~${adiFigure(value, 1).value}` }} size="md" tone="positive" />
           </div>
         ))}
       </div>

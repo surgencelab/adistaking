@@ -1,9 +1,10 @@
 'use client';
 
-import { Skeleton, StatCard } from '@/components/ui';
+import { Figure, Skeleton, StatCard } from '@/components/ui';
 import { useProgramStats } from '@/lib/hooks/usePoolData';
 import { useNow } from '@/lib/hooks/useNow';
-import { formatAdi, formatCountdown, formatUsdCompact } from '@/lib/format';
+import { adiFigure, countdownFigure, usdFigure } from '@/lib/figures';
+import { formatAdi, formatNumber } from '@/lib/format';
 import { Gated } from './Gated';
 
 export function StatTiles({ locked }: { locked: boolean }) {
@@ -13,26 +14,32 @@ export function StatTiles({ locked }: { locked: boolean }) {
   if (isLoading || !stats || now === 0) {
     return (
       <div className="adi-tiles">
-        <Skeleton height={104} />
-        <Skeleton height={104} />
-        <Skeleton height={104} />
+        <Skeleton height={132} />
+        <Skeleton height={132} />
+        <Skeleton height={132} />
       </div>
     );
   }
 
+  const secondsToUnlock = (stats.nextUnlockAt.getTime() - now) / 1000;
+
   return (
     <Gated locked={locked} label="Connect to view program activity">
       <div className="adi-tiles">
-        <StatCard label="Rewards paid" value={formatAdi(stats.rewardsPaid)} caption="Cumulative since program start" />
+        <StatCard
+          label="Rewards paid"
+          value={<Figure figure={adiFigure(stats.rewardsPaid)} size="xl" />}
+          caption="Cumulative since program start"
+        />
         <StatCard
           label="Next unlock"
-          value={formatCountdown((stats.nextUnlockAt.getTime() - now) / 1000)}
-          caption={`${formatAdi(stats.nextUnlockAmount)} unlocks`}
+          value={<Figure figure={countdownFigure(secondsToUnlock)} size="xl" />}
+          caption={`${formatAdi(stats.nextUnlockAmount)} releases`}
         />
         <StatCard
           label="Total Value Locked (TVL)"
-          value={formatUsdCompact(stats.tvlUsd)}
-          caption="At current ADI price"
+          value={<Figure figure={usdFigure(stats.tvlUsd)} size="xl" />}
+          caption={`${formatNumber(stats.tvlAdi, 0)} ADI at the current price`}
         />
       </div>
     </Gated>

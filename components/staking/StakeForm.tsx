@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { AmountInput, Button, DurationSelector, Tooltip } from '@/components/ui';
+import { AmountInput, Button, DurationSelector, Figure, Tooltip } from '@/components/ui';
 import { useToast } from '@/components/providers/ToastProvider';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useAllowance, useTokenBalance } from '@/lib/hooks/useTokenBalance';
@@ -17,7 +17,8 @@ import {
   TOKEN_SYMBOL,
 } from '@/lib/config';
 import { estimateEarnings } from '@/lib/earnings';
-import { formatAdi, formatAdiAuto, formatDateShort, formatNumber, parseAmount } from '@/lib/format';
+import { adiFigure } from '@/lib/figures';
+import { formatAdi, formatAdiAuto, formatDateShort, parseAmount } from '@/lib/format';
 import type { LockTermDays } from '@/lib/types';
 import { EarningsEstimate } from './EarningsEstimate';
 
@@ -75,16 +76,7 @@ export function StakeForm({
       onConnect();
       return;
     }
-    if (blocked) return;
-    if (!value) {
-      toast('Enter an amount to stake.', 'warning');
-      return;
-    }
-    if (amount < MIN_STAKE) {
-      toast(`Minimum stake is ${formatAdi(MIN_STAKE)}.`, 'warning');
-      return;
-    }
-    if (insufficient) return;
+    if (blocked || !canSubmit) return;
 
     try {
       if (needsApproval) {
@@ -106,13 +98,24 @@ export function StakeForm({
     }
   };
 
+  /* The CTA names whatever is standing between the reader and a position, so the
+     button is never a dead end that only explains itself once clicked. */
+  const belowMinimum = hasAmount && amount < MIN_STAKE;
+  const canSubmit = hasAmount && !belowMinimum && !insufficient;
+
   const label = !isConnected
     ? 'Connect wallet'
     : busy
       ? 'Confirm in wallet…'
-      : needsApproval
-        ? `Approve ${TOKEN_SYMBOL}`
-        : `Stake ${TOKEN_SYMBOL}`;
+      : !hasAmount
+        ? 'Enter an amount'
+        : belowMinimum
+          ? `Minimum ${formatAdi(MIN_STAKE)}`
+          : insufficient
+            ? 'Insufficient balance'
+            : needsApproval
+              ? `Approve ${TOKEN_SYMBOL}`
+              : `Stake ${TOKEN_SYMBOL}`;
 
   const row = {
     display: 'flex',
@@ -204,9 +207,11 @@ export function StakeForm({
         </div>
         <div style={{ ...row, borderTop: '1px solid var(--border-subtle)' }}>
           <span style={{ color: 'var(--text-muted)' }}>Est. rewards</span>
-          <b style={{ color: estRewards ? 'var(--positive)' : 'var(--text-heading)' }}>
-            {estRewards ? `${formatNumber(estRewards, 1)} ${TOKEN_SYMBOL}` : `— ${TOKEN_SYMBOL}`}
-          </b>
+          {estRewards ? (
+            <Figure figure={adiFigure(estRewards, 1)} size="sm" tone="positive" />
+          ) : (
+            <Figure figure={{ value: '—', unit: TOKEN_SYMBOL }} size="sm" tone="muted" />
+          )}
         </div>
       </div>
 
@@ -218,7 +223,7 @@ export function StakeForm({
         exampleSource={exampleSource}
       />
 
-      <Button size="lg" loading={busy} onClick={submit} disabled={isConnected && (blocked || insufficient)}>
+      <Button size="lg" loading={busy} onClick={submit} disabled={isConnected && (blocked || !canSubmit)}>
         {label}
       </Button>
 
@@ -236,7 +241,7 @@ export function StakeForm({
         </div>
       )}
 
-      {isConnected && !blocked && (
+      {isConnected && !blocked && canSubmit && (
         <div
           style={{
             background: 'var(--surface-inset)',

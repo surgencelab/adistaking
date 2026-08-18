@@ -43,16 +43,33 @@ export function PoolComposition({ locked, label }: { locked: boolean; label: str
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            font: 'var(--type-small)',
-            color: 'var(--text-muted)',
             flexWrap: 'wrap',
-            gap: 8,
+            gap: '10px 20px',
           }}
         >
           {composition.map((s, i) => (
-            <span key={s.termDays}>
-              <span style={{ color: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}>■</span> {s.termDays} days{' '}
-              <b style={{ color: 'var(--text-heading)' }}>{s.pct}%</b>
+            <span
+              key={s.termDays}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                font: 'var(--type-small)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 10,
+                  height: 3,
+                  borderRadius: 2,
+                  background: SEGMENT_COLORS[i % SEGMENT_COLORS.length],
+                  flexShrink: 0,
+                }}
+              />
+              {s.termDays} days
+              <b style={{ font: '700 13px var(--font-condensed)', color: 'var(--text-heading)' }}>{s.pct}%</b>
             </span>
           ))}
         </div>

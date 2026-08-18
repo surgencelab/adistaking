@@ -1,5 +1,10 @@
 import type { CSSProperties, ReactNode } from 'react';
 
+/**
+ * Label / figure / caption. The value slot carries no typography of its own so
+ * callers pass a <Figure> and keep the two-tone numeral treatment; the label and
+ * caption are deliberately quiet so the figure is the only loud thing here.
+ */
 export function StatCard({
   label,
   value,
@@ -17,10 +22,10 @@ export function StatCard({
         background: 'var(--surface-raised)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
-        padding: '20px 22px',
+        padding: '22px 24px 24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: 14,
         ...style,
       }}
     >
@@ -34,10 +39,10 @@ export function StatCard({
       >
         {label}
       </div>
-      <div style={{ font: 'var(--type-figure-lg)', color: 'var(--text-heading)', textTransform: 'uppercase' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {value}
+        {caption && <div style={{ font: 'var(--type-small)', color: 'var(--text-faint)' }}>{caption}</div>}
       </div>
-      {caption && <div style={{ font: 'var(--type-small)', color: 'var(--text-muted)' }}>{caption}</div>}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Archivo, Archivo_Narrow, IBM_Plex_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers/Providers';
 import { THEME_BOOT_SCRIPT } from '@/lib/theme';
@@ -40,11 +41,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${archivo.variable} ${archivoNarrow.variable} ${plexMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        {/* Set the theme before first paint so the page never flashes the wrong palette. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-      </head>
       <body>
+        {/* Sets the theme before first paint so the page never flashes the wrong palette. */}
+        <Script id="adi-theme-boot" strategy="beforeInteractive">
+          {THEME_BOOT_SCRIPT}
+        </Script>
         <Providers>{children}</Providers>
       </body>
     </html>

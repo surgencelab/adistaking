@@ -42,6 +42,9 @@ export function usePool() {
 }
 
 export function useProgramStats() {
+  // TVL in ADI is total staked, which poolInfo already carries — react-query
+  // dedupes the read, so this costs nothing extra.
+  const { data: pool } = usePool();
   const live = useReadContract({
     address: STAKING_ADDRESS,
     abi: stakingAbi,
@@ -65,6 +68,7 @@ export function useProgramStats() {
     nextUnlockAmount: toNum(raw[2]),
     // No price oracle in the staking contract — wire a price feed here.
     tvlUsd: 0,
+    tvlAdi: pool?.staked ?? 0,
   };
   return { data, isLoading: live.isPending };
 }

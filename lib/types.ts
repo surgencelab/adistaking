@@ -33,6 +33,8 @@ export interface ProgramStats {
   nextUnlockAmount: number;
   /** Total Value Locked in USD at the current ADI price. */
   tvlUsd: number;
+  /** The same figure denominated in ADI — shown beneath the USD value. */
+  tvlAdi: number;
 }
 
 export interface Position {

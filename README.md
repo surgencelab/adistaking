@@ -95,6 +95,28 @@ lib/
 `app/styles/` is a verbatim copy of the handoff's `tokens/`. Corrections live in
 `globals.css` instead, so re-copying the design system's tokens never silently undoes them.
 
+## Craft notes
+
+Decisions that carry the page's feel, so they survive future edits:
+
+- **Two-tone numerals** (`components/ui/Figure.tsx`). Every figure splits into a value and
+  a subordinate unit — `12,847` at full contrast, `ADI` stepped back in size, weight, and
+  colour. The brand rule that numbers always carry units is kept without letting the unit
+  compete with the number. Use `Figure` for any new number; do not hand-set one.
+- **Scale contrast carries hierarchy.** Stat figures run at 42px against 11px labels. The
+  labels are deliberately quiet — if everything is emphasised, nothing is.
+- **Dual denomination** where a second unit is meaningful: `$3.24M` over `251,415 ADI at
+  the current price`.
+- **No legend squares.** Series keys use thin rounded line swatches matching the stroke,
+  not `■` glyphs.
+- **The CTA names the blocker** — "Enter an amount", "Minimum 100 ADI", "Insufficient
+  balance" — instead of failing on click. The step hint only appears once there is
+  something submittable, so it never contradicts the button.
+- **The chart is interactive**, not decorative: range control, crosshair, floating readout,
+  and a header figure that tracks the hovered point.
+- **No developer scaffolding in the UI.** Notes about indexers and placeholder data belong
+  in this file, not on the page.
+
 ## Deviations from the handoff, and why
 
 - **Light theme contrast.** The handoff flags its light palette as extrapolated from
