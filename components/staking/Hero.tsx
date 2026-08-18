@@ -4,7 +4,6 @@ import { Figure } from '@/components/ui';
 import type { Position } from '@/lib/types';
 import { adiFigure } from '@/lib/figures';
 import { PoolOverview } from './PoolOverview';
-import { HeroMeta } from './HeroMeta';
 
 export function Hero({
   locked,
@@ -46,10 +45,6 @@ export function Hero({
         >
           Stake <span style={{ color: 'var(--blue-500)' }}>ADI</span>
         </h1>
-
-        <div style={{ marginTop: 18 }}>
-          <HeroMeta />
-        </div>
 
         <p style={{ font: 'var(--type-body)', color: 'var(--text-muted)', margin: '22px 0 0', maxWidth: 460 }}>
           The $ADI staking program allocates a fixed ecosystem participation incentive to time-locked positions on ADI
