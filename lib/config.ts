@@ -38,9 +38,19 @@ export const LOCK_TERMS: LockTerm[] = [
 
 export const DEFAULT_TERM_DAYS = 180;
 
-/** Stand-in principal for the earnings estimate before an amount is entered and
- *  when no wallet balance is available to preview against. */
-export const EXAMPLE_STAKE = 1_000;
+/**
+ * Whether the displayed APY and the reward estimate are weighted by the lock
+ * multiplier.
+ *
+ * Currently false: the page shows the pool APY (~18.00%) rather than a
+ * term-boosted rate. This matches the FAQ, which describes the multiplier as a
+ * weighting on a position's *share of the reward pool* rather than a direct
+ * multiple of APY — so quoting 18% x 1.75 as an APY overstated it.
+ *
+ * Flip to true to weight both the quoted rate and the estimate by the term
+ * multiplier. Nothing else needs to change.
+ */
+export const APY_INCLUDES_LOCK_MULTIPLIER = false;
 
 /** Rough network fee hint shown under the stake form. */
 export const EST_NETWORK_FEE = '~0.0004 ADI';

@@ -1,33 +1,33 @@
 'use client';
 
 import { Figure, Tooltip } from '@/components/ui';
-import { formatAdiAuto } from '@/lib/format';
-import { adiFigure } from '@/lib/figures';
+import { TOKEN_SYMBOL } from '@/lib/config';
+import { formatAdiAuto, formatNumber } from '@/lib/format';
 import type { EarningsEstimate as Estimate } from '@/lib/earnings';
 
 /**
- * Monthly and annualised earnings for the amount currently in the stake form.
+ * Estimated rewards for the amount currently in the stake form, per month and
+ * per year.
  *
- * Before an amount is entered it previews against the connected wallet's
- * balance, or a stand-in principal when disconnected — so the panel is never
- * empty and the reader can size the return before committing to a number.
+ * Reads zero until an amount is entered. Nothing is projected against the
+ * wallet balance or a stand-in principal: an estimate the reader did not ask
+ * for is an unsolicited return projection, and the zero state makes the figures
+ * plainly a consequence of their own input.
  */
 export function EarningsEstimate({
   estimate,
   principal,
   termDays,
-  isExample,
-  exampleSource,
+  hasAmount,
 }: {
   estimate: Estimate;
   principal: number;
   termDays: number;
-  isExample: boolean;
-  exampleSource: 'balance' | 'default';
+  hasAmount: boolean;
 }) {
   const rows: [string, number][] = [
-    ['Per month', estimate.perMonth],
-    ['Per year', estimate.perYear],
+    ['Per month', hasAmount ? estimate.perMonth : 0],
+    ['Per year', hasAmount ? estimate.perYear : 0],
   ];
 
   return (
@@ -53,8 +53,8 @@ export function EarningsEstimate({
             gap: 6,
           }}
         >
-          Estimated earnings
-          <Tooltip text="Projected from the current pool APY and the selected lock multiplier." />
+          Estimated rewards
+          <Tooltip text="Projected from the current pool APY. Rewards are variable and depend on total pool participation." />
         </span>
         <span style={{ font: '700 12px var(--font-condensed)', color: 'var(--text-muted)' }}>
           ~{estimate.apyPct.toFixed(2)}% APY
@@ -84,19 +84,26 @@ export function EarningsEstimate({
             >
               {label}
             </span>
-            <Figure figure={{ ...adiFigure(value, 1), value: `~${adiFigure(value, 1).value}` }} size="md" tone="positive" />
+            <Figure
+              figure={{
+                value: hasAmount ? `~${formatNumber(value, 1)}` : '0.00',
+                unit: TOKEN_SYMBOL,
+              }}
+              size="md"
+              tone={hasAmount ? 'positive' : 'muted'}
+            />
           </div>
         ))}
       </div>
 
       <p style={{ font: 'var(--type-small)', color: 'var(--text-faint)', margin: 0 }}>
-        {isExample
-          ? exampleSource === 'balance'
-            ? `Example based on your balance of ${formatAdiAuto(principal)}.`
-            : `Example based on ${formatAdiAuto(principal)}.`
-          : `Based on ${formatAdiAuto(principal)} at ~${estimate.apyPct.toFixed(2)}% APY.`}{' '}
+        {hasAmount
+          ? `Based on ${formatAdiAuto(principal)} at ~${estimate.apyPct.toFixed(2)}% APY.`
+          : 'Enter an amount to estimate rewards.'}{' '}
         APY is variable and these projections are not guaranteed.
-        {estimate.termEndsBeforeYear && ` The ${termDays}-day term ends before a full year, so the yearly figure is annualised.`}
+        {hasAmount &&
+          estimate.termEndsBeforeYear &&
+          ` The ${termDays}-day term ends before a full year, so the yearly figure is annualised.`}
       </p>
     </div>
   );

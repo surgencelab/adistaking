@@ -66,17 +66,24 @@ Derived from real state rather than a toggle — `components/staking/StakingPage
 | **stake** | connected, no positions | Pool basics, minimum stake (100 ADI), per-term APY. Pool activity still gated. |
 | **manage** | connected with positions | Positions table with actions, volume chart, full pool composition and recent activity. |
 
-## Earnings estimate
+## Estimated rewards
 
 `components/staking/EarningsEstimate.tsx` sits in the stake form between the summary rows
-and the CTA — per month and per year at the selected term's APY, read before committing to
-an amount. Before an amount is typed it previews against the connected wallet's balance,
-falling back to `EXAMPLE_STAKE`, and says which it used.
+and the CTA — per month and per year, read before committing to an amount.
 
-All four figures — per month, per year, at maturity, and predicted APY — come from
-`estimateEarnings` in `lib/earnings.ts`, so the summary row and the panel cannot drift. The
-per-year figure is annualised, not attainable, on any term shorter than a year; the caption
-says so.
+**It reads zero until an amount is entered.** Nothing is projected against the wallet
+balance or a stand-in principal: an estimate the reader did not ask for is an unsolicited
+return projection, and the zero state makes the figures plainly a consequence of their own
+input.
+
+The rate quoted is the **pool APY (~18.00%)**, not a term-boosted rate. The lock multiplier
+is a weighting on a position's share of the reward pool, as the FAQ describes it, so
+quoting `18% x 1.75` as an APY overstated it. `APY_INCLUDES_LOCK_MULTIPLIER` in
+`lib/config.ts` flips that in one line if the programme's economics say otherwise.
+
+Every figure comes from `estimateEarnings` in `lib/earnings.ts`, so the quoted rate and the
+reward figures cannot drift apart. The per-year figure is annualised, not attainable, on
+any term shorter than a year; the caption says so.
 
 ## Layout
 

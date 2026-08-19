@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { AmountInput, Button, DurationSelector, Figure, Tooltip } from '@/components/ui';
+import { AmountInput, Button, DurationSelector, Tooltip } from '@/components/ui';
 import { useToast } from '@/components/providers/ToastProvider';
 import { useWallet } from '@/lib/hooks/useWallet';
 import { useAllowance, useTokenBalance } from '@/lib/hooks/useTokenBalance';
@@ -9,15 +9,14 @@ import { usePool } from '@/lib/hooks/usePoolData';
 import { useStakeActions } from '@/lib/hooks/useStakeActions';
 import { useNow } from '@/lib/hooks/useNow';
 import {
+  APY_INCLUDES_LOCK_MULTIPLIER,
   DEFAULT_TERM_DAYS,
   EST_NETWORK_FEE,
-  EXAMPLE_STAKE,
   LOCK_TERMS,
   MIN_STAKE,
   TOKEN_SYMBOL,
 } from '@/lib/config';
 import { estimateEarnings } from '@/lib/earnings';
-import { adiFigure } from '@/lib/figures';
 import { RiskDisclosure } from './RiskDisclosure';
 import { formatAdi, formatAdiAuto, formatDateShort, parseAmount } from '@/lib/format';
 import type { LockTermDays } from '@/lib/types';
@@ -56,21 +55,21 @@ export function StakeForm({
   const needsApproval = approved <= 0 || amount > approved;
   const busy = pending === 'approve' || pending === 'stake';
 
-  // Before an amount is typed, the earnings panel previews against the wallet
-  // balance, falling back to a stand-in principal when disconnected.
   const hasAmount = amount > 0;
-  const hasBalance = balance !== undefined && balance > 0;
-  const principal = hasAmount ? amount : hasBalance ? balance : EXAMPLE_STAKE;
-  const exampleSource: 'balance' | 'default' = hasBalance ? 'balance' : 'default';
 
   const estimate = useMemo(
-    () => estimateEarnings(principal, baseApy, term.multiplier, termDays),
-    [baseApy, principal, term.multiplier, termDays],
+    () =>
+      estimateEarnings(
+        amount,
+        baseApy,
+        APY_INCLUDES_LOCK_MULTIPLIER ? term.multiplier : 1,
+        termDays,
+      ),
+    [amount, baseApy, term.multiplier, termDays],
   );
 
   // now is 0 until the shared clock's first tick — show a dash rather than 1970.
   const endDate = useMemo(() => (now ? new Date(now + termDays * DAY_MS) : null), [now, termDays]);
-  const estRewards = hasAmount ? estimate.atMaturity : null;
 
   const submit = async () => {
     if (!isConnected) {
@@ -202,27 +201,9 @@ export function StakeForm({
           <span style={{ color: 'var(--text-muted)' }}>Staking end date</span>
           <b style={{ color: 'var(--text-heading)' }}>{endDate ? formatDateShort(endDate) : '—'}</b>
         </div>
-        <div style={{ ...row, borderTop: '1px solid var(--border-subtle)' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Predicted APY</span>
-          <b style={{ color: 'var(--text-heading)' }}>~{estimate.apyPct.toFixed(2)}%</b>
-        </div>
-        <div style={{ ...row, borderTop: '1px solid var(--border-subtle)' }}>
-          <span style={{ color: 'var(--text-muted)' }}>Est. rewards</span>
-          {estRewards ? (
-            <Figure figure={adiFigure(estRewards, 1)} size="sm" tone="positive" />
-          ) : (
-            <Figure figure={{ value: '—', unit: TOKEN_SYMBOL }} size="sm" tone="muted" />
-          )}
-        </div>
       </div>
 
-      <EarningsEstimate
-        estimate={estimate}
-        principal={principal}
-        termDays={termDays}
-        isExample={!hasAmount}
-        exampleSource={exampleSource}
-      />
+      <EarningsEstimate estimate={estimate} principal={amount} termDays={termDays} hasAmount={hasAmount} />
 
       <Button size="lg" loading={busy} onClick={submit} disabled={isConnected && (blocked || !canSubmit)}>
         {label}
