@@ -1,19 +1,57 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { Figure, Tooltip } from '@/components/ui';
 import { TOKEN_SYMBOL } from '@/lib/config';
-import { formatAdiAuto, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { adiFigure } from '@/lib/figures';
 import type { EarningsEstimate as Estimate } from '@/lib/earnings';
 
 /**
- * Estimated rewards for the amount currently in the stake form, per month and
- * per year.
+ * Estimated rewards for the position about to be opened.
  *
- * Reads zero until an amount is entered. Nothing is projected against the
- * wallet balance or a stand-in principal: an estimate the reader did not ask
- * for is an unsolicited return projection, and the zero state makes the figures
- * plainly a consequence of their own input.
+ * Reads zero until an amount is entered, then shows each figure as a
+ * transition — 0.00 → the new value. The before-state stays on screen so the
+ * numbers read as a consequence of what the reader typed rather than as a
+ * standalone claim about returns, and nothing is ever projected against a
+ * balance the reader did not put into the field.
  */
+function Row({
+  label,
+  after,
+  hasAmount,
+  tone = 'default',
+}: {
+  label: string;
+  after: string;
+  hasAmount: boolean;
+  tone?: 'default' | 'positive';
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 12,
+        padding: '10px 0',
+        borderTop: '1px solid var(--border-subtle)',
+      }}
+    >
+      <span style={{ font: 'var(--type-small)', color: 'var(--text-muted)' }}>{label}</span>
+      {hasAmount ? (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Figure figure={{ value: '0.00' }} size="sm" tone="muted" />
+          <ArrowRight size={13} strokeWidth={2} style={{ color: 'var(--text-faint)', flexShrink: 0 }} />
+          <Figure figure={{ value: after, unit: TOKEN_SYMBOL }} size="sm" tone={tone} />
+        </span>
+      ) : (
+        <Figure figure={{ value: '0.00', unit: TOKEN_SYMBOL }} size="sm" tone="muted" />
+      )}
+    </div>
+  );
+}
+
 export function EarningsEstimate({
   estimate,
   principal,
@@ -25,11 +63,6 @@ export function EarningsEstimate({
   termDays: number;
   hasAmount: boolean;
 }) {
-  const rows: [string, number][] = [
-    ['Per month', hasAmount ? estimate.perMonth : 0],
-    ['Per year', hasAmount ? estimate.perYear : 0],
-  ];
-
   return (
     <div
       style={{
@@ -38,10 +71,18 @@ export function EarningsEstimate({
         padding: '16px 18px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 12,
+        gap: 4,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 10,
+          paddingBottom: 10,
+        }}
+      >
         <span
           style={{
             font: 'var(--type-label)',
@@ -61,45 +102,29 @@ export function EarningsEstimate({
         </span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        {rows.map(([label, value]) => (
-          <div
-            key={label}
-            style={{
-              background: 'var(--surface-row)',
-              borderRadius: 'var(--radius-md)',
-              padding: '12px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-            }}
-          >
-            <span
-              style={{
-                font: 'var(--type-label)',
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: 'var(--tracking-caps)',
-              }}
-            >
-              {label}
-            </span>
-            <Figure
-              figure={{
-                value: hasAmount ? `~${formatNumber(value, 1)}` : '0.00',
-                unit: TOKEN_SYMBOL,
-              }}
-              size="md"
-              tone={hasAmount ? 'positive' : 'muted'}
-            />
-          </div>
-        ))}
-      </div>
+      <Row label="Amount staked" hasAmount={hasAmount} after={adiFigure(principal, 0).value} />
+      <Row
+        label="Per month"
+        hasAmount={hasAmount}
+        after={`~${formatNumber(estimate.perMonth, 1)}`}
+        tone="positive"
+      />
+      <Row
+        label="Per year"
+        hasAmount={hasAmount}
+        after={`~${formatNumber(estimate.perYear, 1)}`}
+        tone="positive"
+      />
 
-      <p style={{ font: 'var(--type-small)', color: 'var(--text-faint)', margin: 0 }}>
-        {hasAmount
-          ? `Based on ${formatAdiAuto(principal)} at ~${estimate.apyPct.toFixed(2)}% APY.`
-          : 'Enter an amount to estimate rewards.'}{' '}
+      <p
+        style={{
+          font: 'var(--type-small)',
+          color: 'var(--text-faint)',
+          margin: 0,
+          paddingTop: 12,
+        }}
+      >
+        {hasAmount ? '' : 'Enter an amount to estimate rewards. '}
         APY is variable and these projections are not guaranteed.
         {hasAmount &&
           estimate.termEndsBeforeYear &&
