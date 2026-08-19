@@ -1,12 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useBrandMark } from '@/lib/hooks/useBrandMark';
 
 /**
- * The brand mark is never redrawn in code — it is loaded from public/.
- * SVG is preferred; a PNG is accepted so whichever format is supplied simply
- * works. Until one is present the wordmark stands alone in type.
- *
  * The corner radius is what makes a mark with its own background plate read as
  * a deliberate app tile rather than a broken cutout. A transparent asset would
  * not need it, but it costs nothing when one arrives.
@@ -14,27 +10,8 @@ import { useEffect, useState } from 'react';
  * The asset is probed rather than rendered-then-caught, so its absence never
  * flashes a broken-image glyph.
  */
-const MARK_CANDIDATES = ['/adi-mark.svg', '/adi-mark.png'];
-
 export function Wordmark() {
-  const [markSrc, setMarkSrc] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const probe = (index: number) => {
-      if (cancelled || index >= MARK_CANDIDATES.length) return;
-      const img = new Image();
-      img.onload = () => !cancelled && setMarkSrc(MARK_CANDIDATES[index]);
-      img.onerror = () => probe(index + 1);
-      img.src = MARK_CANDIDATES[index];
-    };
-
-    probe(0);
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const markSrc = useBrandMark();
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

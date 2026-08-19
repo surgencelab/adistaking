@@ -18,6 +18,7 @@ import {
 } from '@/lib/config';
 import { estimateEarnings } from '@/lib/earnings';
 import { RiskDisclosure } from './RiskDisclosure';
+import { TokenMark } from './TokenMark';
 import { formatAdi, formatAdiAuto, formatDateShort, parseAmount } from '@/lib/format';
 import type { LockTermDays } from '@/lib/types';
 import { EarningsEstimate } from './EarningsEstimate';
@@ -141,6 +142,7 @@ export function StakeForm({
       }}
     >
       <AmountInput
+        icon={<TokenMark size={18} />}
         balance={isConnected && balance !== undefined ? formatAdiAuto(balance) : undefined}
         value={value}
         onChange={(e) => setValue(e.target.value.replace(/[^0-9.,]/g, ''))}

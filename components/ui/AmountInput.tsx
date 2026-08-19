@@ -9,6 +9,7 @@ export function AmountInput({
   onChange,
   onMax,
   token = 'ADI',
+  icon,
   disabled,
   style,
 }: {
@@ -18,6 +19,8 @@ export function AmountInput({
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   onMax?: () => void;
   token?: string;
+  /** Token icon shown in the chip. Defaults to a solid accent dot. */
+  icon?: ReactNode;
   disabled?: boolean;
   style?: CSSProperties;
 }) {
@@ -95,10 +98,18 @@ export function AmountInput({
             color: 'var(--text-heading)',
           }}
         >
-          <span
-            aria-hidden="true"
-            style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--blue-500)', display: 'inline-block' }}
-          />
+          {icon ?? (
+            <span
+              aria-hidden="true"
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                background: 'var(--blue-500)',
+                display: 'inline-block',
+              }}
+            />
+          )}
           {token}
         </span>
       </div>
